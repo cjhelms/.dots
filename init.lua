@@ -1,3 +1,6 @@
+-------------------
+-- P L U G I N S --
+-------------------
 local ensure_packer = function()
   local fn = vim.fn
   local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
@@ -13,48 +16,51 @@ local packer_bootstrap = ensure_packer()
 
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
-  use {
-    'nvim-telescope/telescope.nvim',
-    tag='0.1.0',
-    requires='nvim-lua/plenary.nvim'
-  }
-  use {
-    "akinsho/toggleterm.nvim",
-    tag='*'
-  }
+  use { 'nvim-telescope/telescope.nvim', tag='0.1.0', requires='nvim-lua/plenary.nvim' }
+  use { "akinsho/toggleterm.nvim", tag='*' }
   use 'lewis6991/gitsigns.nvim'
   use 'neovim/nvim-lspconfig'
   use 'feline-nvim/feline.nvim'
-  use 'nvim-tree/nvim-tree.lua'
-  use {
-    "L3MON4D3/LuaSnip",
-    tag = "v<CurrentMajor>.*"
-  }
+  use 'nvim-tree/nvim-web-devicons'
+  use { 'nvim-tree/nvim-tree.lua', requires={ 'nvim-tree/nvim-web-devicons' } }
+
+  -- TODO: Figure out why all this is here
+  use { "L3MON4D3/LuaSnip", tag="v<CurrentMajor>.*" }
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-buffer'
   use 'hrsh7th/cmp-path'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/nvim-cmp'
   use 'saadparwaiz1/cmp_luasnip'
-  use 'sbdchd/neoformat'
+  -- end (figure out)
+
   use 'mileszs/ack.vim'
+  use { "catppuccin/nvim", as="catppuccin" }
 
   if packer_bootstrap then
     require('packer').sync()
   end
 end)
 
--- settings
+---------------------
+-- S E T T I N G S --
+---------------------
+-------------
+-- general --
+-------------
+vim.cmd("colorscheme catppuccin-macchiato")
+
+-- Fix magenta floating windows
+-- TODO: Look into better fix for this
 vim.api.nvim_set_hl(0, 'FloatBorder', {bg='#3B4252', fg='#5E81AC'})
 vim.api.nvim_set_hl(0, 'NormalFloat', {bg='#3B4252'})
 vim.api.nvim_set_hl(0, 'TelescopeNormal', {bg='#3B4252'})
 vim.api.nvim_set_hl(0, 'TelescopeBorder', {bg='#3B4252'})
 
-vim.g.mapleader = ' '
+-- TODO: Figure out what this does
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-vim.opt.hlsearch = false
 vim.opt.breakindent = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
@@ -63,13 +69,28 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.number = true
 vim.opt.relativenumber = true
+
+-- TODO: Figure out what this does
 vim.opt.termguicolors = true
+
+-- TODO: Figure out what this does
 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
 
--- general
+-------------
+-- keybinds --
+-------------
+vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>w', ':w<cr>')
+vim.keymap.set('i', '<c-c>', '<esc>')
+vim.keymap.set('n', '<c-c>', ':noh<cr>')
 
--- telescope 
+-------------------------------
+-- P L U G I N   C O N F I G --
+-------------------------------
+---------------
+-- telescope --
+---------------
+-- TODO: Figure out why '+' char appears when tabbing through results
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
@@ -77,20 +98,30 @@ vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 require('telescope').setup()
 
--- toggleterm
+----------------
+-- toggleterm --
+----------------
 require('toggleterm').setup{
   open_mapping=[[<c-l>]],
   direction='float'
 }
 
--- gitsigns
+--------------
+-- gitsigns --
+--------------
 require('gitsigns').setup()
 
--- luansip
+-------------
+-- luansip --
+-------------
+-- TODO: Figure out what luasnip is doing
 luasnip = require('luasnip')
 require("luasnip.loaders.from_vscode").lazy_load()
 
--- nvim-cmp
+--------------
+-- nvim-cmp --
+--------------
+-- TODO: Figoure what this function is for
 local has_words_before = function()
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
@@ -99,6 +130,7 @@ end
 local cmp = require('cmp')
 cmp.setup({
   snippet={
+    -- TODO: What does this do?
     expand=function(args)
       luasnip.lsp_expand(args.body)
     end,
@@ -108,12 +140,15 @@ cmp.setup({
     documentation=cmp.config.window.bordered(),
   },
   completion={
-    completeopt = 'menu,menuone,noinsert'
+    -- TODO: What is this for?
+    completeopt='menu,menuone,noinsert'
   },
   mapping = cmp.mapping.preset.insert({
     ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4)),
     ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4)),
+    -- TODO: What does this do?
     ['<C-Space>'] = cmp.mapping(cmp.mapping.complete()),
+    -- TODO: What does this do?
     ['<C-e>'] = cmp.mapping.abort(),
     ['<C-n>'] = {
         c = function(fallback)
@@ -155,6 +190,7 @@ cmp.setup({
         end
     end,
   }),
+  -- TODO: What is this?
   sources=cmp.config.sources({
     { name='nvim_lsp' },
     { name='luasnip' },
@@ -163,7 +199,10 @@ cmp.setup({
   }),
 })
 
--- lspconfig
+---------------
+-- lspconfig --
+---------------
+-- TODO: noremap? silent?
 local opts = { noremap=true, silent=true }
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
@@ -191,33 +230,27 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<leader>f', function() vim.lsp.buf.format { async = true } end, bufopts)
 end
 
+-- TODO: What is this (capabilities)?
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 require('lspconfig')['clangd'].setup({
   capabilities=capabilities,
   on_attach=on_attach,
+  cmd={ "clangd-12" },
 })
 
--- feline
+------------
+-- feline --
+------------
 require('feline').setup()
 
--- nvim-tree
+---------------
+-- nvim-tree --
+---------------
 vim.keymap.set('n', 'tt', ':NvimTreeToggle<cr>')
 vim.keymap.set('n', 'tf', ':NvimTreeFocus<cr>')
-require("nvim-tree").setup({
-  renderer={
-    icons={
-      show={
-        file=false,
-        folder=false,
-        git=false,
-        folder_arrow=false,
-      }
-    }
-  }
-})
+require("nvim-tree").setup()
 
--- neoformat
-vim.keymap.set('n', '<leader>e', ':Neoformat<cr>')
-
--- ack.vim
-vim.keymap.set('n', '<c-f>', ':Ack! ')
+-------------
+-- ack.vim --
+-------------
+vim.keymap.set('n', '<leader>fa', ':Ack! ')
